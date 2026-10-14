@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <base href="/cdcpengembangankarir/">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Sistem Informasi Resmi Career Development Center (CDC) / UPA. Pengembangan Karir dan Kewirausahaan Politeknik Negeri Lhokseumawe. Registrasi & E-Tiket PNL Job Fair 2026.">
+  <meta name="theme-color" content="#FFB300">
+
+  <!-- iOS meta tags & icons -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="CDC PNL">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+  <!-- Favicon Resmi Logo PNL -->
+  <link rel="icon" type="image/png" href="favicon.png"/>
+  <link rel="shortcut icon" href="favicon.png"/>
+
+  <title>CDC Politeknik Negeri Lhokseumawe | PNL Job Fair 2026</title>
+  <link rel="manifest" href="manifest.json">
+
+  <!-- Google Fonts: Premium Corporate Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background-color: #F8F9FF;
+      color: #0F172A;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    #cdc-splash-loader {
+      position: fixed;
+      inset: 0;
+      z-index: 999999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(
+        circle at 50% 30%,
+        rgba(255, 179, 0, 0.18) 0%,
+        rgba(37, 99, 235, 0.12) 35%,
+        rgba(248, 249, 255, 1) 72%
+      );
+      transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.7s;
+    }
+
+    .glass-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 38px 46px;
+      border-radius: 30px;
+      background: rgba(255, 255, 255, 0.80);
+      backdrop-filter: blur(32px);
+      -webkit-backdrop-filter: blur(32px);
+      border: 1px solid rgba(255, 255, 255, 0.95);
+      box-shadow:
+        0 24px 56px rgba(0, 0, 0, 0.08),
+        0 4px 16px rgba(0, 0, 0, 0.04),
+        0 0 60px rgba(255, 179, 0, 0.12),
+        0 0 0 1px rgba(29, 111, 242, 0.06);
+      max-width: 440px;
+      text-align: center;
+    }
+
+    .logo-container {
+      position: relative;
+      width: 100px;
+      height: 100px;
+      margin-bottom: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-img {
+      width: 90px;
+      height: 90px;
+      object-fit: cover;
+      border-radius: 50%;
+      background: #FFFFFF;
+      padding: 3px;
+      box-shadow: 0 0 25px rgba(255, 179, 0, 0.45);
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Dynamic Spectrum Ring: 6 Jurusan Colors + PNL Signature Yellow */
+    .pulsing-ring {
+      position: absolute;
+      inset: -5px;
+      border-radius: 50%;
+      padding: 3px;
+      background: conic-gradient(
+        from 0deg,
+        #2563EB 0%,    /* Biru (Teknik Sipil) */
+        #EF4444 16%,   /* Merah (Teknik Mesin) */
+        #F97316 33%,   /* Orange (Teknik Kimia) */
+        #A855F7 50%,   /* Ungu (Tata Niaga) */
+        #B45309 66%,   /* Coklat (TIK) */
+        #10B981 83%,   /* Hijau (Teknik Elektro) */
+        #FFB300 100%   /* Kuning Emas Utama PNL */
+      );
+      -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #fff calc(100% - 2.5px));
+      mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #fff calc(100% - 2.5px));
+      animation: spin 3s linear infinite;
+      z-index: 1;
+      filter: drop-shadow(0 0 10px rgba(255, 179, 0, 0.5));
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 5px 14px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      background: rgba(255, 179, 0, 0.16);
+      border: 1px solid rgba(255, 179, 0, 0.4);
+      color: #FFB300;
+      margin-bottom: 12px;
+    }
+
+    .title {
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+      color: #0F172A;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+    }
+
+    .sub {
+      font-size: 12px;
+      color: #94A3B8;
+      margin-bottom: 4px;
+    }
+
+    .inst {
+      font-size: 13px;
+      font-weight: 700;
+      color: #FFB300;
+      letter-spacing: 0.5px;
+      margin-bottom: 18px;
+    }
+
+    .spectrum-dots {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      margin-bottom: 18px;
+    }
+
+    .spectrum-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      box-shadow: 0 0 6px currentColor;
+    }
+
+    .progress-bar-bg {
+      width: 190px;
+      height: 4px;
+      background: rgba(29, 111, 242, 0.12);
+      border-radius: 10px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-bar-fill {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 45%;
+      background: linear-gradient(90deg, #2563EB, #EF4444, #F97316, #A855F7, #B45309, #10B981, #FFB300, #FFFFFF);
+      border-radius: 10px;
+      animation: indeterminate 1.8s ease-in-out infinite;
+    }
+
+    @keyframes indeterminate {
+      0% { left: -45%; width: 45%; }
+      50% { left: 30%; width: 55%; }
+      100% { left: 100%; width: 45%; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Elegant Antigravity Island Splash Screen with 6 Department Colors + PNL Signature Yellow -->
+  <div id="cdc-splash-loader">
+    <div class="glass-box">
+      <div class="logo-container">
+        <div class="pulsing-ring"></div>
+        <img class="logo-img" src="logo_pnl.jpg" alt="Logo Politeknik Negeri Lhokseumawe">
+      </div>
+      <div class="badge">PNL JOB FAIR 2026</div>
+      <div class="title">CAREER DEVELOPMENT CENTER</div>
+      <div class="sub">UPA. Pengembangan Karir & Kewirausahaan</div>
+      <div class="inst">POLITEKNIK NEGERI LHOKSEUMAWE</div>
+
+      <!-- 6 Jurusan Spectrum Indicator -->
+      <div class="spectrum-dots">
+        <span class="spectrum-dot" style="background:#2563EB; color:#2563EB;" title="Teknik Sipil"></span>
+        <span class="spectrum-dot" style="background:#EF4444; color:#EF4444;" title="Teknik Mesin"></span>
+        <span class="spectrum-dot" style="background:#F97316; color:#F97316;" title="Teknik Kimia"></span>
+        <span class="spectrum-dot" style="background:#A855F7; color:#A855F7;" title="Tata Niaga"></span>
+        <span class="spectrum-dot" style="background:#B45309; color:#B45309;" title="TIK"></span>
+        <span class="spectrum-dot" style="background:#10B981; color:#10B981;" title="Teknik Elektro"></span>
+        <span class="spectrum-dot" style="background:#FFB300; color:#FFB300; width:9px; height:9px;" title="Kuning PNL"></span>
+      </div>
+
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Fade out and remove loading screen once Flutter renders the first frame
+    window.addEventListener('flutter-first-frame', function () {
+      var splash = document.getElementById('cdc-splash-loader');
+      if (splash) {
+        splash.style.opacity = '0';
+        setTimeout(function () {
+          splash.style.visibility = 'hidden';
+          splash.remove();
+        }, 650);
+      }
+    });
+
+    // Fallback safety timeout if flutter-first-frame takes longer
+    setTimeout(function () {
+      var splash = document.getElementById('cdc-splash-loader');
+      if (splash && splash.style.opacity !== '0') {
+        splash.style.opacity = '0';
+        setTimeout(function () {
+          if (splash) splash.remove();
+        }, 650);
+      }
+    }, 9000);
+  </script>
+
+  <script src="flutter_bootstrap.js" async></script>
+</body>
+</html>
