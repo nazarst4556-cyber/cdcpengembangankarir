@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
 import 'state/app_controller.dart';
 import 'theme/app_theme.dart';
+import 'views/admin_page.dart';
 import 'views/auth_page.dart';
 import 'views/dashboard_page.dart';
 import 'views/landing_page.dart';
 import 'widgets/liquid_glass.dart';
 
-void main() {
+import 'services/supabase_service.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await SupabaseService.initialize();
   runApp(const PnlCdcApp());
 }
 
@@ -57,6 +62,9 @@ class MainScaffold extends StatelessWidget {
         break;
       case AppPage.dashboard:
         activeView = const DashboardPage();
+        break;
+      case AppPage.admin:
+        activeView = const AdminPage();
         break;
     }
 

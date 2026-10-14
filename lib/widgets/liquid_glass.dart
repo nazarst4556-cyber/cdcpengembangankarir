@@ -609,7 +609,7 @@ class IslandJurusanSpectrumBadge extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           Text(
-            'PNL 6 JURUSAN',
+            'LINTAS 6 JURUSAN VOKASI',
             style: TextStyle(
               fontSize: 10,
               fontWeight: FontWeight.w800,

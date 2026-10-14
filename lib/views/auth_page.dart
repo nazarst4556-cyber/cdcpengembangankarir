@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/app_models.dart';
+import '../services/blockchain_service.dart';
 import '../state/app_controller.dart';
 import '../theme/app_theme.dart';
 import '../widgets/liquid_glass.dart';
@@ -68,6 +69,7 @@ class _AuthPageState extends State<AuthPage> {
         category: _selectedCategory,
         identityNumber: _idController.text.trim(),
         major: _majorController.text.trim(),
+        password: _passwordController.text.trim(),
       );
     } else {
       await controller.loginUser(
@@ -106,7 +108,24 @@ class _AuthPageState extends State<AuthPage> {
                       style: TextStyle(color: AppColors.pnlCyanGlow, fontWeight: FontWeight.w600),
                     ),
                   ),
-                  const IslandJurusanSpectrumBadge(),
+                  Row(
+                    children: [
+                      TextButton.icon(
+                        onPressed: () => controller.setPage(AppPage.admin),
+                        icon: const Icon(Icons.admin_panel_settings_rounded, size: 16, color: AppColors.pnlSignatureGold),
+                        label: const Text(
+                          'Portal Admin',
+                          style: TextStyle(
+                            color: AppColors.pnlSignatureGold,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      const IslandJurusanSpectrumBadge(),
+                    ],
+                  ),
                 ],
               ),
 
@@ -360,12 +379,26 @@ class _AuthPageState extends State<AuthPage> {
 
                       Align(
                         alignment: Alignment.centerRight,
-                        child: Text(
-                          'Lupa Kata Sandi?',
-                          style: TextStyle(
-                            fontSize: 12.5,
-                            color: AppColors.pnlCyanGlow,
-                            fontWeight: FontWeight.w500,
+                        child: InkWell(
+                          onTap: () => _showForgotPasswordE2EEDialog(context, controller),
+                          borderRadius: BorderRadius.circular(6),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: const [
+                                Icon(Icons.shield_outlined, size: 14, color: AppColors.pnlSignatureGold),
+                                SizedBox(width: 4),
+                                Text(
+                                  'Lupa Kata Sandi? (E2EE Recovery)',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: AppColors.pnlSignatureGold,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -482,6 +515,289 @@ class _AuthPageState extends State<AuthPage> {
               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               isDense: true,
             ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // END-TO-END CRYPTOGRAPHIC PASSWORD RECOVERY DIALOG
+  // ══════════════════════════════════════════════════════════════════════════
+  void _showForgotPasswordE2EEDialog(BuildContext context, AppController controller) {
+    final emailResetCtrl = TextEditingController(text: _emailController.text);
+    final idResetCtrl = TextEditingController(text: _idController.text);
+    final keyResetCtrl = TextEditingController();
+    final newPassCtrl = TextEditingController();
+    bool isProcessing = false;
+    String? errorMsg;
+    String? successMsg;
+
+    showDialog(
+      context: context,
+      builder: (dialogCtx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          contentPadding: EdgeInsets.zero,
+          content: Container(
+            width: 480,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Header
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Color(0xFF090D16),
+                        Color(0xFF0F172A),
+                        Color(0xFF1E293B),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: AppColors.pnlSignatureGold.withOpacity(0.2),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.enhanced_encryption_rounded,
+                            color: AppColors.pnlSignatureGold, size: 22),
+                      ),
+                      const SizedBox(width: 12),
+                      const Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Pemulihan Sandi Kriptografis',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w900,
+                                color: Colors.white,
+                              ),
+                            ),
+                            SizedBox(height: 2),
+                            Text(
+                              'Validasi Zero-Knowledge E2EE & Hash SHA-256',
+                              style: TextStyle(fontSize: 11, color: Colors.white70),
+                            ),
+                          ],
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () => Navigator.of(dialogCtx).pop(),
+                        icon: const Icon(Icons.close_rounded, color: Colors.white70, size: 18),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Form
+                Padding(
+                  padding: const EdgeInsets.all(22),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (errorMsg != null)
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          margin: const EdgeInsets.only(bottom: 12),
+                          decoration: BoxDecoration(
+                            color: AppColors.roseWarning.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.error_outline_rounded, color: AppColors.roseWarning, size: 16),
+                              const SizedBox(width: 6),
+                              Expanded(
+                                child: Text(errorMsg!, style: const TextStyle(color: AppColors.roseWarning, fontSize: 11.5)),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                      if (successMsg != null)
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          margin: const EdgeInsets.only(bottom: 12),
+                          decoration: BoxDecoration(
+                            color: AppColors.emeraldVerified.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.check_circle_rounded, color: AppColors.emeraldVerified, size: 16),
+                              const SizedBox(width: 6),
+                              Expanded(
+                                child: Text(successMsg!, style: const TextStyle(color: AppColors.emeraldVerified, fontSize: 11.5, fontWeight: FontWeight.w700)),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                      _buildModalField('Email Akun CDC', emailResetCtrl, 'email@pnl.ac.id', Icons.mail_outline_rounded),
+                      const SizedBox(height: 10),
+                      _buildModalField('NIM atau NIK', idResetCtrl, '2105102044', Icons.badge_outlined),
+                      const SizedBox(height: 10),
+
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Kunci Pemulihan 6-Kata Kriptografi',
+                            style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700, color: Color(0xFF1E293B)),
+                          ),
+                          InkWell(
+                            onTap: () {
+                              final autoKey = BlockchainService.generateRecoverySeedPhrase(
+                                emailResetCtrl.text.trim(),
+                                idResetCtrl.text.trim(),
+                              );
+                              setDialogState(() => keyResetCtrl.text = autoKey);
+                            },
+                            child: const Text(
+                              'Generate Kunci Valid',
+                              style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w800, color: AppColors.pnlPrimary),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 5),
+                      TextField(
+                        controller: keyResetCtrl,
+                        style: const TextStyle(fontSize: 12, fontFamily: 'monospace', fontWeight: FontWeight.w700),
+                        decoration: InputDecoration(
+                          hintText: 'kata1-kata2-kata3-kata4-kata5-kata6',
+                          hintStyle: const TextStyle(fontSize: 11.5, color: AppColors.textDim),
+                          isDense: true,
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                          filled: true,
+                          fillColor: AppColors.bgLight,
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Colors.black12)),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+
+                      _buildModalField('Kata Sandi Baru', newPassCtrl, 'Minimal 6 karakter', Icons.lock_outline_rounded, isPassword: true),
+                    ],
+                  ),
+                ),
+
+                // Footer Actions
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                  decoration: BoxDecoration(
+                    color: AppColors.bgCard,
+                    border: Border(top: BorderSide(color: Colors.black.withOpacity(0.06))),
+                    borderRadius: const BorderRadius.vertical(bottom: Radius.circular(20)),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton(
+                        onPressed: () => Navigator.of(dialogCtx).pop(),
+                        child: const Text('Batal', style: TextStyle(color: AppColors.textMuted)),
+                      ),
+                      const SizedBox(width: 8),
+                      ElevatedButton(
+                        onPressed: isProcessing
+                            ? null
+                            : () async {
+                                final email = emailResetCtrl.text.trim();
+                                final id = idResetCtrl.text.trim();
+                                final key = keyResetCtrl.text.trim();
+                                final newPass = newPassCtrl.text.trim();
+
+                                if (email.isEmpty || id.isEmpty || key.isEmpty || newPass.isEmpty) {
+                                  setDialogState(() => errorMsg = 'Harap lengkapi semua kolom pemulihan.');
+                                  return;
+                                }
+
+                                setDialogState(() {
+                                  isProcessing = true;
+                                  errorMsg = null;
+                                });
+
+                                await Future.delayed(const Duration(milliseconds: 500));
+
+                                final success = await controller.resetPasswordWithRecoveryKey(
+                                  email: email,
+                                  identityNumber: id,
+                                  recoveryKey: key,
+                                  newPassword: newPass,
+                                );
+
+                                if (success) {
+                                  setDialogState(() {
+                                    isProcessing = false;
+                                    successMsg = 'Kata sandi berhasil dipulihkan secara terenkripsi!';
+                                  });
+                                  await Future.delayed(const Duration(milliseconds: 900));
+                                  if (dialogCtx.mounted) {
+                                    Navigator.of(dialogCtx).pop();
+                                  }
+                                } else {
+                                  setDialogState(() {
+                                    isProcessing = false;
+                                    errorMsg = 'Kunci pemulihan tidak valid atau tidak cocok dengan data akun.';
+                                  });
+                                }
+                              },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF0F172A),
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            side: BorderSide(color: AppColors.pnlSignatureGold.withOpacity(0.5)),
+                          ),
+                        ),
+                        child: isProcessing
+                            ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                            : const Text('Verifikasi & Simpan Sandi', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 12)),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildModalField(String label, TextEditingController ctrl, String hint, IconData icon, {bool isPassword = false}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700, color: Color(0xFF1E293B))),
+        const SizedBox(height: 5),
+        TextField(
+          controller: ctrl,
+          obscureText: isPassword,
+          style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600),
+          decoration: InputDecoration(
+            hintText: hint,
+            hintStyle: const TextStyle(fontSize: 11.5, color: AppColors.textDim),
+            prefixIcon: Icon(icon, size: 16, color: AppColors.textMuted),
+            isDense: true,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+            filled: true,
+            fillColor: AppColors.bgLight,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Colors.black12)),
           ),
         ),
       ],

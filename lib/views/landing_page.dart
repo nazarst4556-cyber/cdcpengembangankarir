@@ -364,6 +364,7 @@ class _LandingPageState extends State<LandingPage> with TickerProviderStateMixin
                   _buildNavAnchor('Agenda 2026', () => _scrollTo(_jobFairKey)),
                   _buildNavAnchor('Layanan CDC', () => _scrollTo(_servicesKey)),
                   _buildNavAnchor('Mitra Industri', () => _scrollTo(_companiesKey)),
+                  _buildNavAnchor('Portal Admin', () => controller.setPage(AppPage.admin)),
                   _buildNavAnchor('Kontak', () => _scrollTo(_footerKey)),
                   const SizedBox(width: 8),
                 ] else
@@ -558,6 +559,15 @@ class _LandingPageState extends State<LandingPage> with TickerProviderStateMixin
                 onTap: () {
                   Navigator.pop(ctx);
                   _scrollTo(_companiesKey);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.admin_panel_settings_rounded, color: AppColors.pnlPrimary),
+                title: const Text('Portal Admin CDC (Real-Time)'),
+                subtitle: const Text('Kelola mitra & pantau pendaftar on-chain'),
+                onTap: () {
+                  Navigator.pop(ctx);
+                  controller.setPage(AppPage.admin);
                 },
               ),
               const Divider(),
